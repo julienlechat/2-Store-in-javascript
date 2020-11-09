@@ -30,21 +30,21 @@ function loadIndex(){
 }
 // AFFICHAGE DES ARTICLES
 function createArticle(nb, data) {
-    var titlePage = addNewElement(0, 'h1', mainDiv, '', "display-4 mt-5 mb-5 text-center", '', '', '', "Nos articles")
-    var articlesDiv = addNewElement(0, 'div', mainDiv, "articles", "row", '', '', '', '')
+    var titlePage = addNewElement(0, 'h1', mainDiv, '', "display-4 mt-5 mb-5 text-center", '', '', '', '', "Nos articles")
+    var articlesDiv = addNewElement(0, 'div', mainDiv, "articles", "row", '', '', '', '', '')
     // ARTICLE A L'UNITE
     for (let i = 0; i < nb; i++) {
         var price = data[i].price /100
-        let firstDiv = addNewElement(0, 'div', articlesDiv, "", "col-lg-4 col-md-6", '', '','', '')
-        let secondDiv = addNewElement(0, 'div', firstDiv, i, "card mt-1 mb-4 shadow-sm anim-zoom", '', '', '', '')
+        let firstDiv = addNewElement(0, 'div', articlesDiv, "", "col-lg-4 col-md-6", '', '','', '','')
+        let secondDiv = addNewElement(0, 'div', firstDiv, i, "card mt-1 mb-4 shadow-sm anim-zoom", '', '', '', '', '')
         secondDiv.addEventListener('click', function() {
             openArticleReq(data[i]._id)
         }, false);
-        var nameDiv = addNewElement(0, 'div', secondDiv, "", "card-header font-weight-bold", '', '', '', data[i].name)
-        var imgDiv = addNewElement(0, 'img', secondDiv, "", "card-img-top", '', '', data[i].imageUrl, data[i].name)
-        var cardBodyDiv = addNewElement(0, 'div', secondDiv, "", "card-body", '', '', '', '')
-        var priceDiv =  addNewElement(0, 'h5', cardBodyDiv, "", "card-title", '', '', '', price.toFixed(2).replace(".", ",") + "€")
-        var descDiv = addNewElement(0, 'p', cardBodyDiv, "", "card-text", '', '', '', data[i].description)
+        var nameDiv = addNewElement(0, 'div', secondDiv, "", "card-header font-weight-bold", '', '', '', '', data[i].name)
+        var imgDiv = addNewElement(0, 'img', secondDiv, "", "card-img-top", '', '', data[i].imageUrl, data[i].description, data[i].name)
+        var cardBodyDiv = addNewElement(0, 'div', secondDiv, "", "card-body", '', '', '', '', '')
+        var priceDiv =  addNewElement(0, 'span', cardBodyDiv, "", "badge bg-secondary", '', '', '', '', price.toFixed(2).replace(".", ",") + "€")
+        var descDiv = addNewElement(0, 'p', cardBodyDiv, "", "card-text", '', '', '', '',data[i].description)
     }
 }
 // INDEX -> REQ JSON -> ARTICLE
@@ -55,9 +55,7 @@ function openArticleReq(id) {
     xhttp.onreadystatechange = function() {
         if(this.readyState === 4) {
             if (this.status === 200) {
-                //data = xhttp.response;
                 openArticleRes(xhttp.response);
-                console.log('envoie des infos')
             } else if(this.status === 404) {
                 alertSpoil('Erreur 404', 'Fichier introuvable', 'alert-danger')
                 return
@@ -73,38 +71,36 @@ function openArticleReq(id) {
 function openArticleRes(data) {
     newPage(data.name)
     var price = data.price /100
-
     //BOUTON RETOUR
-    let returnButton = addNewElement(0, 'button', mainDiv, '', 'btn btn-outline-secondary', '', 'button', '', 'Retour')
+    let returnButton = addNewElement(0, 'button', mainDiv, '', 'btn btn-outline-secondary', '', 'button', '', '', 'Retour')
     returnButton.addEventListener('click', function() {
         loadIndex();
     }, false);
+    let articleMainDiv = addNewElement(0, 'div', mainDiv, '', 'card mt-4 box-shadow anim-zoom-min shadow-sm', '', '', '', '', '')
+    let imgDiv = addNewElement(0, 'img', articleMainDiv, '', 'card-img-top', '', '', data.imageUrl, data.description, '')
+    let articleMainDiv2 = addNewElement(0, 'div', mainDiv, '', 'card mt-4 box-shadow anim-zoom-min shadow-sm', '', '', '', '', '')
+    let cardHeaderDiv = addNewElement(0, 'div', articleMainDiv2, '', 'card-header', '', '', '', '', '')
+    let titleDiv = addNewElement(0, 'h4', cardHeaderDiv, '', 'my-0 font-weight-normal text-center', '', '', '', '', data.name)
+    let cardBodyDiv = addNewElement(0, 'div', articleMainDiv2, '', 'card-body', '', '', '', '', '')
+    let priceDiv = addNewElement(0, 'h5', cardBodyDiv, '', 'card-title', '', '', '', '', price.toFixed(2).replace( ".", "," ) + "€")
+    let descDiv = addNewElement(0, 'p', cardBodyDiv, '', 'card-text', '', '', '', '', data.description)
+    let couleurText = addNewElement(0, 'strong', cardBodyDiv, '', '', '', '', '', '', 'Couleur :')
+    let dropDownDiv = addNewElement(0, 'div', cardBodyDiv, '', 'ml-2 mt-2 dropdown', '', '', '', '', '')
 
-    let articleMainDiv = addNewElement(0, 'div', mainDiv, '', 'card mt-4 box-shadow anim-zoom-min shadow-sm', '', '', '', '')
-    let imgDiv = addNewElement(0, 'img', articleMainDiv, '', 'card-img-top', '', '', data.imageUrl, '')
-    let articleMainDiv2 = addNewElement(0, 'div', mainDiv, '', 'card mt-4 box-shadow anim-zoom-min shadow-sm', '', '', '', '')
-    let cardHeaderDiv = addNewElement(0, 'div', articleMainDiv2, '', 'card-header', '', '', '', '')
-    let titleDiv = addNewElement(0, 'h4', cardHeaderDiv, '', 'my-0 font-weight-normal text-center', '', '', '', data.name)
-    let cardBodyDiv = addNewElement(0, 'div', articleMainDiv2, '', 'card-body', '', '', '', '')
-    let priceDiv = addNewElement(0, 'h5', cardBodyDiv, '', 'card-title', '', '', '', price.toFixed(2).replace( ".", "," ) + "€")
-    let descDiv = addNewElement(0, 'p', cardBodyDiv, '', 'card-text', '', '', '', data.description)
-    let couleurText = addNewElement(0, 'strong', cardBodyDiv, '', '', '', '', '', 'Couleur :')
-    let dropDownDiv = addNewElement(0, 'div', cardBodyDiv, '', 'ml-2 mt-2 dropdown', '', '', '', '')
-
-    let dropButton = addNewElement(0, 'button', dropDownDiv, 'dropdownMenuButton', 'btn btn-secondary dropdown-toggle', '', 'button', '', 'Couleur')
+    let dropButton = addNewElement(0, 'button', dropDownDiv, 'dropdownMenuButton', 'btn btn-secondary dropdown-toggle', '', 'button', '', '', 'Couleur')
     dropButton.setAttribute('data-toggle','dropdown')
     dropButton.setAttribute('aria-haspopup', 'true')
     dropButton.setAttribute('aria-expanded', 'false')
 
-    let downMenuDiv = addNewElement(0, 'div', dropDownDiv, '', 'dropdown-menu', '', '', '', '')
+    let downMenuDiv = addNewElement(0, 'div', dropDownDiv, '', 'dropdown-menu', '', '', '', '', '')
     downMenuDiv.setAttribute('aria-labelledby', 'dropdownMenuButton')
 
     for (let i = 0; i < data.colors.length; i++) {
-        var color = addNewElement(0, 'a', downMenuDiv, '', 'dropdown-item', '', '', '', data.colors[i])
+        var color = addNewElement(0, 'a', downMenuDiv, '', 'dropdown-item', '', '', '', '', data.colors[i])
         if (i === 0) dropButton.innerHTML = data.colors[i]
         color.addEventListener('click', function() {
             dropButton.innerHTML = data.colors[i]
         }, false);
     }
-    let addPanierDiv = addNewElement(0, 'button', cardBodyDiv, '', 'btn btn-lg btn-block btn-primary mx-auto mt-2', 'max-width: 300px;', '', '', 'Ajouter au panier')
+    let addPanierDiv = addNewElement(0, 'button', cardBodyDiv, '', 'btn btn-lg btn-block btn-primary mx-auto mt-2', 'max-width: 300px;', '', '', '', 'Ajouter au panier')
 }

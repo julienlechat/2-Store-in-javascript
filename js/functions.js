@@ -24,7 +24,7 @@ function alertSpoil(title, desc, color) {
     buttonAlert.setAttribute('aria-label', 'Close')
 }
 // AJOUTER UN ELEMENT
-function addNewElement(val, elementName, to, id, className, style, type, src, content) {
+function addNewElement(val, elementName, to, id, className, style, type, src, alt, content) {
     let newElement = (val === 0) ? document.createElement(elementName) : (val === 1) ? document.getElementById(elementName) : document.getElementsByClassName(elementName)
 
     if (id !== "") newElement.id = id
@@ -32,6 +32,7 @@ function addNewElement(val, elementName, to, id, className, style, type, src, co
     if (style !== "") newElement.style = style
     if (type !== "") newElement.type = type
     if (src !== "") newElement.src = src
+    if (alt !== "") newElement.alt = alt
     if (content !== "") newElement.innerHTML = content
 
     to.appendChild(newElement);
