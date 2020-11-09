@@ -1,0 +1,51 @@
+.article-index,
+.carousel,
+.article-desc {
+  transition: transform 0.5s;
+}
+.article-index:hover {
+  transform: scale(1.1);
+  cursor: pointer;
+}
+.article-desc:hover {
+  transform: scale(1.02);
+}
+.carousel:hover {
+  transform: scale(1.02);
+}
+
+.carousel .carousel-indicators li {
+  background-color: #fff;
+  background-color: rgba(70, 70, 70, 0.25);
+}
+.carousel .carousel-indicators .active {
+  background-color: #444;
+}
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  height: 50px;
+  width: 50px;
+  outline: black;
+  background-size: 100%, 100%;
+  border-radius: 50%;
+  border: 1px solid black;
+  background-image: none;
+}
+
+.carousel-control-next-icon:after {
+  content: ">";
+  font-size: 28px;
+  color: black;
+}
+
+.carousel-control-prev-icon:after {
+  content: "<";
+  font-size: 28px;
+  color: black;
+}
+
+@media (max-width: 612px) {
+  .card:hover {
+    transform: scale(1.015);
+  }
+}
