@@ -1,4 +1,5 @@
 const article = 'teddies'
+const link = 'http://' + window.location.hostname + ':3000/api/'
 
 let mainDiv = document.getElementById("main")
 
@@ -16,12 +17,10 @@ function ready(fn) {
     }
 }
 function loadIndex(){
-    document.title = "Orinoco - Accueil"
-    mainDiv.innerHTML = ''
+    newPage('Accueil')
 
     var xhttp = new XMLHttpRequest();
-
-    xhttp.open("GET", 'http://' + window.location.hostname + ':3000/api/' + article, true);
+    xhttp.open("GET", link + article, true);
     xhttp.responseType = "json";
     xhttp.onreadystatechange = function() {
         if(this.readyState === 4) {
@@ -37,70 +36,30 @@ function loadIndex(){
     }
     xhttp.send();
 }
-
 function createArticle(nb, data) {
+    //CREATION DE LA PAGE 'NOS ARTICLES'
+    var titlePage = addNewElement(0, 'h1', mainDiv, '', "display-4 mt-5 mb-5 text-center", '', '', '', "Nos articles")
+    var articlesDiv = addNewElement(0, 'div', mainDiv, "articles", "row", '', '', '', '')
 
-    var titlePage = document.createElement('h1')
-    titlePage.className = "display-4 mt-5 mb-5 text-center"
-    titlePage.innerHTML = "Nos articles"
-    mainDiv.appendChild(titlePage)
-
-    var articlesDiv = document.createElement('div')
-    articlesDiv.id = "articles"
-    articlesDiv.className = "row"
-    mainDiv.appendChild(articlesDiv)
-
+    // ARTICLE A L'UNITE
     for (let i = 0; i < nb; i++) {
-        //CREATION DIV TABLEAU
-        var firstDiv = document.createElement('div')
-        firstDiv.className = "col-lg-4 col-md-6";
-        articlesDiv.appendChild(firstDiv)
-        
-        //SECOND DIV ( CARD )
-        var secondDiv = document.createElement('div')
-        secondDiv.className = "card mt-1 mb-4 shadow-sm article-index";
-        secondDiv.id = i
+        var price = data[i].price /100
+
+        let firstDiv = addNewElement(0, 'div', articlesDiv, "", "col-lg-4 col-md-6", '', '','', '')
+        let secondDiv = addNewElement(0, 'div', firstDiv, i, "card mt-1 mb-4 shadow-sm article-index", '', '', '', '')
         secondDiv.addEventListener('click', function() {
             openArticleReq(data[i]._id)
-            console.log('Ouvrir le lien ' + data[i]._id)
         }, false);
-        firstDiv.appendChild(secondDiv)
-
-
-        //NAME DIV
-        var nameDiv = document.createElement('div')
-        nameDiv.className = "card-header font-weight-bold";
-        nameDiv.innerHTML = data[i].name
-        secondDiv.appendChild(nameDiv)
-
-        //IMAGE DIV
-        var imgDiv = document.createElement('img')
-        imgDiv.className = "card-img-top";
-        imgDiv.src = data[i].imageUrl
-        secondDiv.appendChild(imgDiv)
-
-        //DIV CARD-BODY
-        var cardBodyDiv = document.createElement('div')
-        cardBodyDiv.className = "card-body"
-        secondDiv.appendChild(cardBodyDiv)
-
-        //PRICE H5
-        var priceDiv = document.createElement('h5')
-        priceDiv.className = "card-title"
-        var price = data[i].price /100
-        priceDiv.innerHTML = price.toFixed(2).replace(".", ",") + "€"
-        cardBodyDiv.appendChild(priceDiv)
-
-        //DESCRIPTION p
-        var descDiv = document.createElement('p')
-        descDiv.className = "card-text"
-        descDiv.innerHTML = data[i].description
-        cardBodyDiv.appendChild(descDiv)
+        var nameDiv = addNewElement(0, 'div', secondDiv, "", "card-header font-weight-bold", '', '', '', data[i].name)
+        var imgDiv = addNewElement(0, 'img', secondDiv, "", "card-img-top", '', '', data[i].imageUrl, data[i].name)
+        var cardBodyDiv = addNewElement(0, 'div', secondDiv, "", "card-body", '', '', '', '')
+        var priceDiv =  addNewElement(0, 'h5', cardBodyDiv, "", "card-title", '', '', '', price.toFixed(2).replace(".", ",") + "€")
+        var descDiv = addNewElement(0, 'p', cardBodyDiv, "", "card-text", '', '', '', data[i].description)
     }
 }
 function openArticleReq(id) {
     let xhttp = new XMLHttpRequest();
-    xhttp.open("GET", 'http://' + window.location.hostname + ':3000/api/' + article + '/' + id, true);
+    xhttp.open("GET", link + article + '/' + id, true);
     xhttp.responseType = "json";
     xhttp.onreadystatechange = function() {
         if(this.readyState === 4) {
@@ -120,120 +79,71 @@ function openArticleReq(id) {
     xhttp.send();
 }
 function openArticleRes(data) {
-    mainDiv.innerHTML = ''
-    document.title = "Orinoco - " + data.name
+    newPage(data.name)
+    var price = data.price /100
 
     //BOUTON RETOUR
-    let returnButton = document.createElement('button')
-    returnButton.setAttribute('type', 'button')
-    returnButton.className = "btn btn-outline-secondary"
-    returnButton.innerHTML = 'Retour'
+    let returnButton = addNewElement(0, 'button', mainDiv, '', 'btn btn-outline-secondary', '', 'button', '', 'Retour')
     returnButton.addEventListener('click', function() {
         loadIndex();
     }, false);
-    mainDiv.appendChild(returnButton)
 
+    //ARTICLE IMG
+    let articleMainDiv = addNewElement(0, 'div', mainDiv, '', 'card mt-4 box-shadow article-desc shadow-sm', '', '', '', '')
+    let imgDiv = addNewElement(0, 'img', articleMainDiv, '', 'card-img-top', '', '', data.imageUrl, '')
+    
+    //ARTICLE DESCRIPTION
+    let articleMainDiv2 = addNewElement(0, 'div', mainDiv, '', 'card mt-4 box-shadow article-desc shadow-sm', '', '', '', '')
+    let cardHeaderDiv = addNewElement(0, 'div', articleMainDiv2, '', 'card-header', '', '', '', '')
+    let titleDiv = addNewElement(0, 'h4', cardHeaderDiv, '', 'my-0 font-weight-normal text-center', '', '', '', data.name)
+    let cardBodyDiv = addNewElement(0, 'div', articleMainDiv2, '', 'card-body', '', '', '', '')
+    let priceDiv = addNewElement(0, 'h5', cardBodyDiv, '', 'card-title', '', '', '', price.toFixed(2).replace( ".", "," ) + "€")
+    let descDiv = addNewElement(0, 'p', cardBodyDiv, '', 'card-text', '', '', '', data.description)
+    let couleurText = addNewElement(0, 'strong', cardBodyDiv, '', '', '', '', '', 'Couleur :')
+    let dropDownDiv = addNewElement(0, 'div', cardBodyDiv, '', 'ml-2 mt-2 dropdown', '', '', '', '')
 
-    //IMAGE
-    let articleMainDiv = document.createElement('div')
-    articleMainDiv.className = "card mt-4 box-shadow article-desc shadow-sm"
-    mainDiv.appendChild(articleMainDiv)
-
-    let imgDiv = document.createElement('img')
-    imgDiv.className = "card-img-top"
-    imgDiv.src = data.imageUrl
-    articleMainDiv.appendChild(imgDiv)
-
-    // PARTIE 2
-    articleMainDiv = document.createElement('div')
-    articleMainDiv.className = "card mt-4 box-shadow article-desc shadow-sm"
-    mainDiv.appendChild(articleMainDiv)
-
-    //TITRE
-    let cardHeaderDiv = document.createElement('div')
-    cardHeaderDiv.className = "card-header"
-    articleMainDiv.appendChild(cardHeaderDiv)
-   
-    let titleDiv = document.createElement('h4')
-    titleDiv.className = "my-0 font-weight-normal text-center"
-    titleDiv.innerHTML = data.name
-    cardHeaderDiv.appendChild(titleDiv)
-
-    let cardBodyDiv = document.createElement('div')
-    cardBodyDiv.className = "card-body"
-    articleMainDiv.appendChild(cardBodyDiv)
-
-    let priceDiv = document.createElement('h5')
-    priceDiv.className = "card-title"
-    var price = data.price /100
-    priceDiv.innerHTML = price.toFixed(2).replace( ".", "," ) + "€"
-    cardBodyDiv.appendChild(priceDiv)
-
-    let descDiv = document.createElement('p')
-    descDiv.className = "card-text"
-    descDiv.innerHTML = data.description
-    cardBodyDiv.appendChild(descDiv)
-
-    let dropDownDiv = document.createElement('div')
-    dropDownDiv.className = "dropdown"
-    cardBodyDiv.appendChild(dropDownDiv)
-    /*
-        function setAttributes(div, dict){
-            for (i = 0; i < len(dict); i++){
-                div.setAttribute(dict[i].keys, dict[i].values)
-            }
-        }
-        {"data-tootle": dropdown, "aria": true"}
-    */
-    let dropButton = document.createElement('button')
-    dropButton.className = "btn btn-secondary dropdown-toggle"
-    dropButton.setAttribute('type', 'button')
-    dropButton.id = "dropdownMenuButton"
+    let dropButton = addNewElement(0, 'button', dropDownDiv, 'dropdownMenuButton', 'btn btn-secondary dropdown-toggle', '', 'button', '', 'Couleur')
     dropButton.setAttribute('data-toggle','dropdown')
     dropButton.setAttribute('aria-haspopup', 'true')
     dropButton.setAttribute('aria-expanded', 'false')
-    dropButton.innerHTML = "Couleur"
-    dropDownDiv.appendChild(dropButton)
 
-    let downMenuDiv = document.createElement('div')
-    downMenuDiv.className = "dropdown-menu"
+    let downMenuDiv = addNewElement(0, 'div', dropDownDiv, '', 'dropdown-menu', '', '', '', '')
     downMenuDiv.setAttribute('aria-labelledby', 'dropdownMenuButton')
-    dropDownDiv.appendChild(downMenuDiv)
 
     for (let i = 0; i < data.colors.length; i++) {
-        var color = document.createElement('a')
-        color.className = "dropdown-item"
-        if (i === 0) color.className = "dropdown-item active"
-        color.innerHTML = data.colors[i]
-        downMenuDiv.appendChild(color)
+        var color = addNewElement(0, 'a', downMenuDiv, '', 'dropdown-item', '', '', '', data.colors[i])
+        if (i === 0) dropButton.innerHTML = data.colors[i]
+        color.addEventListener('click', function() {
+            dropButton.innerHTML = data.colors[i]
+        }, false);
     }
+    let addPanierDiv = addNewElement(0, 'button', cardBodyDiv, '', 'btn btn-lg btn-block btn-primary mx-auto mt-2', 'max-width: 300px;', '', '', 'Ajouter au panier')
+}
+function addNewElement(val, elementName, to, id, className, style, type, src, content) {
+    let newElement = (val === 0) ? document.createElement(elementName) : (val === 1) ? document.getElementById(elementName) : document.getElementsByClassName(elementName)
 
-    let addPanierDiv = document.createElement('button')
-    addPanierDiv.type = "button"
-    addPanierDiv.className = "btn btn-lg btn-block btn-primary mx-auto mt-2"
-    addPanierDiv.style = "max-width: 300px;"
-    addPanierDiv.innerHTML = "Ajouter au panier"
-    cardBodyDiv.appendChild(addPanierDiv)
+    if (id !== "") newElement.id = id
+    if (className !== "") newElement.className = className
+    if (style !== "") newElement.style = style
+    if (type !== "") newElement.type = type
+    if (src !== "") newElement.src = src
+    if (content !== "") newElement.innerHTML = content
 
+    to.appendChild(newElement);
+    return newElement
+}
+function newPage(title) {
+    document.title = "Orinoco - " + title
+    mainDiv.innerHTML = ''
 }
 function alertSpoil(title, desc, color) {
-    var container = document.getElementById("main");
-
     var divAlert = document.createElement('div');
     divAlert.className = "alert " + color + " alert-dismissible fade show mx-5";
     divAlert.setAttribute('role', 'alert')
     divAlert.innerHTML = "<strong>" + title + "</strong> " + desc
-    container.prepend(divAlert);
+    mainDiv.prepend(divAlert);
 
-    var buttonAlert = document.createElement('button')
-    buttonAlert.type = "button"
-    buttonAlert.className = "close"
+    var buttonAlert = addNewElement(0, 'button', divAlert, '', 'btn-close', '', 'button', '', '')
     buttonAlert.setAttribute('data-dismiss', 'alert')
     buttonAlert.setAttribute('aria-label', 'Close')
-    divAlert.appendChild(buttonAlert);
-
-    var contentButton = document.createElement('span')
-    contentButton.setAttribute('aria-hidden','true')
-    contentButton.innerHTML = "&times;"
-    buttonAlert.appendChild(contentButton);
 }
