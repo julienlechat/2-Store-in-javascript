@@ -1,6 +1,5 @@
 const article = 'teddies'
 const link = 'http://' + window.location.hostname + ':3000/api/'
-
 let mainDiv = document.getElementById("main")
 
 //EXECUTION CODE
@@ -8,14 +7,7 @@ ready(function() {
     loadIndex();
 });
 
-//FONCTIONS
-function ready(fn) {
-    if (document.readyState !=  "loading") {
-        fn()
-    } else {
-        document.addEventListener("DOMContentLoaded", fn);
-    }
-}
+// REQUETE JSON -> LISTE ARTICLES
 function loadIndex(){
     newPage('Accueil')
 
@@ -36,17 +28,15 @@ function loadIndex(){
     }
     xhttp.send();
 }
+// AFFICHAGE DES ARTICLES
 function createArticle(nb, data) {
-    //CREATION DE LA PAGE 'NOS ARTICLES'
     var titlePage = addNewElement(0, 'h1', mainDiv, '', "display-4 mt-5 mb-5 text-center", '', '', '', "Nos articles")
     var articlesDiv = addNewElement(0, 'div', mainDiv, "articles", "row", '', '', '', '')
-
     // ARTICLE A L'UNITE
     for (let i = 0; i < nb; i++) {
         var price = data[i].price /100
-
         let firstDiv = addNewElement(0, 'div', articlesDiv, "", "col-lg-4 col-md-6", '', '','', '')
-        let secondDiv = addNewElement(0, 'div', firstDiv, i, "card mt-1 mb-4 shadow-sm article-index", '', '', '', '')
+        let secondDiv = addNewElement(0, 'div', firstDiv, i, "card mt-1 mb-4 shadow-sm anim-zoom", '', '', '', '')
         secondDiv.addEventListener('click', function() {
             openArticleReq(data[i]._id)
         }, false);
@@ -57,6 +47,7 @@ function createArticle(nb, data) {
         var descDiv = addNewElement(0, 'p', cardBodyDiv, "", "card-text", '', '', '', data[i].description)
     }
 }
+// INDEX -> REQ JSON -> ARTICLE
 function openArticleReq(id) {
     let xhttp = new XMLHttpRequest();
     xhttp.open("GET", link + article + '/' + id, true);
@@ -78,6 +69,7 @@ function openArticleReq(id) {
     }
     xhttp.send();
 }
+// PAGE ARTICLE
 function openArticleRes(data) {
     newPage(data.name)
     var price = data.price /100
@@ -88,12 +80,9 @@ function openArticleRes(data) {
         loadIndex();
     }, false);
 
-    //ARTICLE IMG
-    let articleMainDiv = addNewElement(0, 'div', mainDiv, '', 'card mt-4 box-shadow article-desc shadow-sm', '', '', '', '')
+    let articleMainDiv = addNewElement(0, 'div', mainDiv, '', 'card mt-4 box-shadow anim-zoom-min shadow-sm', '', '', '', '')
     let imgDiv = addNewElement(0, 'img', articleMainDiv, '', 'card-img-top', '', '', data.imageUrl, '')
-    
-    //ARTICLE DESCRIPTION
-    let articleMainDiv2 = addNewElement(0, 'div', mainDiv, '', 'card mt-4 box-shadow article-desc shadow-sm', '', '', '', '')
+    let articleMainDiv2 = addNewElement(0, 'div', mainDiv, '', 'card mt-4 box-shadow anim-zoom-min shadow-sm', '', '', '', '')
     let cardHeaderDiv = addNewElement(0, 'div', articleMainDiv2, '', 'card-header', '', '', '', '')
     let titleDiv = addNewElement(0, 'h4', cardHeaderDiv, '', 'my-0 font-weight-normal text-center', '', '', '', data.name)
     let cardBodyDiv = addNewElement(0, 'div', articleMainDiv2, '', 'card-body', '', '', '', '')
@@ -118,32 +107,4 @@ function openArticleRes(data) {
         }, false);
     }
     let addPanierDiv = addNewElement(0, 'button', cardBodyDiv, '', 'btn btn-lg btn-block btn-primary mx-auto mt-2', 'max-width: 300px;', '', '', 'Ajouter au panier')
-}
-function addNewElement(val, elementName, to, id, className, style, type, src, content) {
-    let newElement = (val === 0) ? document.createElement(elementName) : (val === 1) ? document.getElementById(elementName) : document.getElementsByClassName(elementName)
-
-    if (id !== "") newElement.id = id
-    if (className !== "") newElement.className = className
-    if (style !== "") newElement.style = style
-    if (type !== "") newElement.type = type
-    if (src !== "") newElement.src = src
-    if (content !== "") newElement.innerHTML = content
-
-    to.appendChild(newElement);
-    return newElement
-}
-function newPage(title) {
-    document.title = "Orinoco - " + title
-    mainDiv.innerHTML = ''
-}
-function alertSpoil(title, desc, color) {
-    var divAlert = document.createElement('div');
-    divAlert.className = "alert " + color + " alert-dismissible fade show mx-5";
-    divAlert.setAttribute('role', 'alert')
-    divAlert.innerHTML = "<strong>" + title + "</strong> " + desc
-    mainDiv.prepend(divAlert);
-
-    var buttonAlert = addNewElement(0, 'button', divAlert, '', 'btn-close', '', 'button', '', '')
-    buttonAlert.setAttribute('data-dismiss', 'alert')
-    buttonAlert.setAttribute('aria-label', 'Close')
 }
