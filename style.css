@@ -9,6 +9,11 @@
 .anim-zoom-min:hover {
   transform: scale(1.02);
 }
+#index,
+#panier {
+  cursor: pointer;
+}
+
 @media (max-width: 612px) {
   .anim-zoom:hover {
     transform: scale(1.015);
