@@ -1,10 +1,8 @@
 // PAGE PRETE
 function ready(fn) {
-    if (document.readyState !=  "loading") {
-        fn()
-    } else {
-        document.addEventListener("DOMContentLoaded", fn);
-    }
+    if (document.readyState !=  "loading"){fn()}
+    else
+    {document.addEventListener("DOMContentLoaded", fn)}
 }
 // NOUVELLE PAGE
 function newPage(title) {
@@ -13,22 +11,13 @@ function newPage(title) {
 }
 // ALERTE
 function alertSpoil(title, desc, color) {
-    var divAlert = document.createElement('div');
-    divAlert.className = "alert " + color + " alert-dismissible fade show mx-5";
-    divAlert.setAttribute('role', 'alert')
-    divAlert.innerHTML = desc
-    mainDiv.prepend(divAlert);
-
-    divAlert.prepend(addNewElement(0, 'strong', divAlert, '', '', '', '', '', '', title + ' ', 0))
-
-    var buttonAlert = addNewElement(0, 'button', divAlert, '', 'btn-close', '', 'button', '', '', '', 1)
-    buttonAlert.setAttribute('data-dismiss', 'alert')
-    buttonAlert.setAttribute('aria-label', 'Close')
+    divAlert = addNewElement(0, 'div', mainDiv, '', 'alert ' + color + ' alert-dismissible fade show mx-5', '', '', '', '', ' ' + desc, [['role','alert']], 2)
+    divTitle = addNewElement(0, 'strong', divAlert, '', '', '', '', '', '', title + '', '', 2)
+    buttonAlert = addNewElement(0, 'button', divAlert, '', 'btn-close', '', 'button', '', '', '', [['data-dismiss','alert'],['aria-dismiss','Close']], 1)
 }
 // AJOUTER UN ELEMENT
-function addNewElement(val, elementName, to, id, className, style, type, src, alt, content, append) {
-    let newElement = (val === 0) ? document.createElement(elementName) : (val === 1) ? document.getElementById(elementName) : document.getElementsByClassName(elementName)
-
+function addNewElement(val, elementName, to, id, className, style, type, src, alt, content, attribut, append) {
+    if (val === 0){newElement = document.createElement(elementName)}else if(val === 1){newElement = document.getElementById(elementName)}else{newElement = document.getElementsByClassName(elementName)}
     if (id !== "") newElement.id = id
     if (className !== "") newElement.className = className
     if (style !== "") newElement.style = style
@@ -36,17 +25,17 @@ function addNewElement(val, elementName, to, id, className, style, type, src, al
     if (src !== "") newElement.src = src
     if (alt !== "") newElement.alt = alt
     if (content !== "") newElement.innerHTML = content
-
+    if (attribut !== "") for (let i = 0; i < attribut.length; i++) newElement.setAttribute(attribut[i][0],attribut[i][1])
     if (append === 1) to.appendChild(newElement);
+    if (append === 2) to.prepend(newElement);
     return newElement
 }
+// PANIER
 function loadPanier() {
     if (localStorage.getItem("panier") !== null) {
         panier = JSON.parse(localStorage.getItem("panier"))
         showPanierValue(panier)
-    } else {
-        panier = []
-    }
+    } else {panier = []}
     return panier
 }
 function addPanier(id, color, panier) {
@@ -58,13 +47,9 @@ function addPanier(id, color, panier) {
 function delPanier(id) {
     panier.splice(panier.indexOf(id), 1)
     localStorage.setItem("panier", JSON.stringify(panier))
-    openPanier()
+    openPanier() //a voir pour delete
     showPanierValue(panier)
 }
 function showPanierValue(panier) {
-    if (panier.length > 0) {
-        let panierDiv = addNewElement(1, 'panier', '', 'panier', 'nav-link', '', '', '', '', '<strong>Panier <span class="badge bg-secondary">' + panier.length +'</span></strong>', 0)
-    } else {
-        let panierDiv = addNewElement(1, 'panier', '', 'panier', 'nav-link', '', '', '', '', 'Panier', 0)
-    }
+    panier.length > 0 ? panierDiv = addNewElement(1, 'panier', '', 'panier', 'nav-link', '', '', '', '', '<strong>Panier <span class="badge bg-secondary">' + panier.length +'</span></strong>', '', 0) : panierDiv = addNewElement(1, 'panier', '', 'panier', 'nav-link', '', '', '', '', 'Panier', '', 0)
 }
