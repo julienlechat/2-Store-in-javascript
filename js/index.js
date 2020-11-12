@@ -80,13 +80,14 @@ function openArticleRes(data) {
     // AJOUTER AUX PANIER
     addPanierDiv = addNewElement(0, 'button', cardBodyDiv, '', 'btn btn-lg btn-block btn-primary mx-auto mt-2', 'max-width: 300px;', '', '', '', 'Ajouter au panier', '', 1)
     addPanierDiv.addEventListener('click', function() {
-        panier = addPanier(data._id, dropButton.innerHTML, panier)
-        console.log('panier: ' + panier)
+        panier = checkPanier(0, data._id, dropButton.innerHTML, panier, '')
     }, false);
 }
 // PAGE PANIER
 function openPanier(){
     newPage('Panier')
+    var pricetot = 0
+    var infosProduct = []
         cardDiv = addNewElement(0, 'div', mainDiv, '', 'card shopping-cart mt-5', '', '', '', '', '', '', 1)
         cardHeaderDiv = addNewElement(0, 'div', cardDiv, '', 'card-header bg-dark text-light align-middle', '', '', '', '', '', '', 1)
             iconDiv = addNewElement(0, 'i', cardHeaderDiv, '', 'fa fa-shopping-cart', '', '', '', '', '', '', 1)
@@ -97,33 +98,48 @@ function openPanier(){
 
         // PRODUIT DANS LE PANIER
         for (let i = 0; i < panier.length; i++) {
-            var pricetot = 0
+            productDiv = addNewElement(0, 'div', cardBodyDiv, i, 'row', '', '', '', '', '', '', 1)
+                contentRowDiv = addNewElement(0, 'div', productDiv, '', 'col-4 col-sm-3 col-md-3 col-lg-2 text-center', '', '', '', '', '', '', 1)
+                    contentRowImg = addNewElement(0, 'img', contentRowDiv, '', 'img-responsive', 'max-height: 80px; max-width: 120px;', '', '', 'test', '', '', 1)
+                contentRow2Div = addNewElement(0, 'div', productDiv, '', 'col-8 col-sm-6 col-md-6 col-lg-8', '', '', '', '', '', '', 1)
+                    contentRow2Name = addNewElement(0, 'h4', contentRow2Div, '', 'product-name mb-0', '', '', '', '', '', '', 1)
+                        contentRow2NameStrong = addNewElement(0, 'strong', contentRow2Name, '', '', '', '', '', '', 'article.name', '', 1)
+                    contentRow2Color = addNewElement(0, 'h6', contentRow2Div, '', 'mt-0', '', '', '', '', '', '', 1)
+                        contentRow2ColorText = addNewElement(0, 'small', contentRow2Color, '', '', '', '', '', '', '', '', 1)
+                    contentRow2Desc = addNewElement(0, 'h5', contentRow2Div, '', '', '', '', '', '', '', '', 1)
+                        contentRow2DescStrong = addNewElement(0, 'small', contentRow2Desc, '', '', '', '', '', '', 'article.description', '', 1)
+                contentRow3Div = addNewElement(0, 'div', productDiv, '', 'row justify-content-end align-items-center mt-2 col-12 col-sm-3 col-md-3 col-lg-2', '', '', '', '', '', '', 1)
+                    contentRow3Price = addNewElement(0, 'div', contentRow3Div, '', 'col-6 col-sm-12 col-lg-10', '', '', '', '', '', '', 1)
+                        priceDiv = addNewElement(0, 'h6', contentRow3Price, '', '', '', '', '', '', '', '', 1)
+                            PriceName = addNewElement(0, 'strong', priceDiv, '', 'text-muted', '', '', '', '', 'Prix: ', '', 1)
+                                priceStrong = addNewElement(0, 'strong', priceDiv, '', '', '', '', '', '', '', '', 1)
+                        quantityDiv = addNewElement(0, 'h6', contentRow3Price, '', '', '', '', '', '', '', '', 1)
+                            quantityName = addNewElement(0, 'strong', quantityDiv, '', 'text-muted', '', '', '', '', 'Quantité: ', '', 1)
+                                quantityStrong = addNewElement(0, 'strong', quantityDiv, '', '', '', '', '', '', '', '', 1)
+                    contentRow3Delete = addNewElement(0, 'div', contentRow3Div, '', 'col-2 col-sm-6 text-right', '', '', '', '', '', '', 1)
+                        deleteDiv = addNewElement(0, 'button', contentRow3Delete, '', 'btn btn-outline-danger btn-xs', '', 'button', '', '', '', [['onclick','deleteFunction(this.parentNode.parentNode.parentNode.id)']], 1)
+                            deleteIconDiv = addNewElement(0, 'i', deleteDiv, '', 'fa fa-trash', '', '', '', '', '', '', 1)
+            if(i+1<panier.length) {hrDiv = addNewElement(0, 'hr', productDiv, '', 'my-3', '', '', '', '', '', '', 1)}else{hrDiv= ''}
+
+            infosProduct.push([productDiv, contentRowImg, contentRow2NameStrong, contentRow2DescStrong, contentRow2ColorText, 0, priceStrong, quantityStrong, hrDiv, deleteDiv])
+            panier[i][3] = infosProduct[i]
+
             oneArticleReq(panier[i][0], function (article) {
-                pricetot +=(article.price /100)
-                price = article.price /100
-                productDiv = addNewElement(0, 'div', cardBodyDiv, '', 'row', '', '', '', '', '', '', 1)
-                    contentRowDiv = addNewElement(0, 'div', productDiv, '', 'col-4 col-sm-3 col-md-3 col-lg-2 text-center', '', '', '', '', '', '', 1)
-                        contentRowImg = addNewElement(0, 'img', contentRowDiv, '', 'img-responsive', 'max-height: 80px; max-width: 120px;', '', article.imageUrl, 'test', '', '', 1)
-                    contentRow2Div = addNewElement(0, 'div', productDiv, '', 'col-5 col-sm-6 col-md-7 col-lg-8', '', '', '', '', '', '', 1)
-                        contentRow2Name = addNewElement(0, 'h4', contentRow2Div, '', 'product-name', '', '', '', '', '', '', 1)
-                            contentRow2NameStrong = addNewElement(0, 'strong', contentRow2Name, '', '', '', '', '', '', article.name, '', 1)
-                        contentRow2Desc = addNewElement(0, 'h5', contentRow2Div, '', '', '', '', '', '', '', '', 1)
-                            contentRow2DescStrong = addNewElement(0, 'small', contentRow2Desc, '', '', '', '', '', '', article.description, '', 1)
-                    contentRow3Div = addNewElement(0, 'div', productDiv, '', 'col-3 col-sm-3 col-md-2 col-lg-2 text-right', '', '', '', '', '', '', 1)
-                        contentRow3Price = addNewElement(0, 'div', contentRow3Div, '', 'text-center', 'padding-top: 5px;', '', '', '', '', '', 1)
-                            priceDiv = addNewElement(0, 'h6', contentRow3Price, '', '', '', '', '', '', '', '', 1)
-                                priceStrong = addNewElement(0, 'strong', priceDiv, '', '', '', '', '', '', price.toFixed(2).replace( ".", "," ), '', 1)
-                                    priceDevice = addNewElement(0, 'strong',priceStrong, '', 'text-muted', '', '', '', '', ' €', '', 1)
-                        contentRow3Delete = addNewElement(0, 'div', contentRow3Div, '', 'text-right mr-3', '', '', '', '', '', '', 1)
-                            deleteDiv = addNewElement(0, 'button', contentRow3Delete, '', 'btn btn-outline-danger btn-xs', '', 'button', '', '', '', '', 1)
-                                deleteIconDiv = addNewElement(0, 'i', deleteDiv, '', 'fa fa-trash', '', '', '', '', '', '', 1)
-                if (i+1 < panier.length) hrDiv = addNewElement(0, 'hr', cardBodyDiv, '', '', '', '', '', '', '', '', 1)
-                if(i+1 === panier.length) pricetotaldiv = addNewElement(0, 'strong', priceTotDiv, '', '', '', '', '', '', pricetot.toFixed(2).replace( ".", "," ) + ' €', '', 1)
-                deleteDiv.addEventListener('click', function() {
-                    delPanier(panier[i])
-                }, false);
+                quantity = parseInt(panier[i][2], 10)
+                price = (article.price/100)*quantity
+                pricetot += price
+                panier[i][3][1].src = article.imageUrl
+                panier[i][3][2].innerHTML = article.name
+                panier[i][3][3].innerHTML = article.description
+                panier[i][3][4].innerHTML = panier[i][1]
+                panier[i][3][5] = (article.price/100)
+                panier[i][3][6].innerHTML = price.toFixed(2).replace( ".", "," ) + '€'
+                panier[i][3][7].innerHTML = 'x' + panier[i][2]
+                pricetotaldiv.innerHTML = pricetot.toFixed(2).replace( ".", "," ) + '€'
             }, function (err) { error })
         }
+
+        pricetotaldiv = addNewElement(0, 'strong', priceTotDiv, 'pricetotal', '', '', '', '', '', '0,00€', '', 1)
         informationDiv = addNewElement(0, 'h4', cardFooterDiv, '', 'text-center my-4', '', '', '', '', 'Entrez vos informations', '', 1)
 
         //FORMULAIRE
@@ -146,12 +162,31 @@ function openPanier(){
                 adressInvalide = addNewElement(0, 'div', colAdress, '', 'invalid-feedback', '', '', '', '', 'Une adresse valide est requise', '', 1)
             colPostal = addNewElement(0, 'div', form, '', 'col-sm-6', '', '', '', '', '', '', 1)
                 postalLabel = addNewElement(0, 'label', colPostal, '', 'form-label', '', '', '', '', 'Code postal', [['for','postal']], 1)
-                postalInput = addNewElement(0, 'input', colPostal, 'postal', 'form-control', '', 'text', '', '', '', '', 1)
+                postalInput = addNewElement(0, 'input', colPostal, 'postal', 'form-control', '', 'text', '', '', '', [['placeholder','75000']], 1)
                 postalInvalide = addNewElement(0, 'div', colPostal, '', 'invalid-feedback', '', '', '', '', 'Un code postal valide est requis', '', 1)
             colVille = addNewElement(0, 'div', form, '', 'col-sm-6', '', '', '', '', '', '', 1)
                 villeLabel = addNewElement(0, 'label', colVille, '', 'form-label', '', '', '', '', 'Ville', [['for', 'ville']], 1)
-                villeInput = addNewElement(0, 'input', colVille, 'ville', 'form-control', '', 'text', '', '', '', '', 1)
+                villeInput = addNewElement(0, 'input', colVille, 'ville', 'form-control', '', 'text', '', '', '', [['placeholder','Paris']], 1)
                 villeInvalide = addNewElement(0, 'div', colVille, '', 'invalid-feedback', '', '', '', '', 'Une ville valide est requise', '', 1)
             hrDiv = addNewElement(0, 'hr', form, '', '', '', '', '', '', '', '', 1)
             validButton = addNewElement(0, 'button', form, '', 'btn btn-primary btn-lg -btn-block', '', 'submit', '', '', 'Procéder au paiement', '', 1)
+
+            validButton.addEventListener('click', function() {
+                //ENVOYER LE FORMULAIRE
+            }, false);
+}
+function deleteFunction(id) {
+    id = parseInt(id, 10)
+    let priceTot = 0
+    if (panier[id][2] === 1) {
+        panier[id][3][0].remove()
+        console.log('je delete: ',panier[id][3][0])
+        if (id+1 === panier.length && id>0) panier[id-1][3][8].remove()
+    } 
+    panier = checkPanier(1, panier[id][0], panier[id][1], panier, id)
+    for (f=0;f<panier.length;f++){
+        priceTot += panier[f][3][5]*panier[f][2]
+        panier[f][3][0].id = f
+    }
+    pricetotaldiv.innerHTML = priceTot.toFixed(2).replace( ".", "," ) + '€' 
 }
