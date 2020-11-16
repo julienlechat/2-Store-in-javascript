@@ -1,134 +1,125 @@
 const article = 'teddies'
 const link = 'http://' + window.location.hostname + ':3000/api/'
 mainDiv = document.getElementById("main")
-indexButton = document.getElementById("index")
-panierButton = document.getElementById("panier")
 
-//EXECUTION CODE
+//EXECUTION CODE -> LOAD PANIER | CHARGES LES ARTICLES DANS L'INDEX | BUTTON INDEX | BUTTON PANIER
 ready(function() {
-    panier = loadPanier();
-    allArticlesReq(function (res){
-       createArticle(res)
-    }, function (error) { error});
-    indexButton.addEventListener('click', function() {
-        allArticlesReq(function (res){
-            createArticle(res)
-         }, function (error) { error});
-    }, false);
-    panierButton.addEventListener('click', function() {
-        openPanier();
-    }, false);
+    panier = loadPanier()
+    loadArticles()
 });
+
+//CHARGE PAGE DES ARTICLES ( INDEX )
+function loadArticles() {
+    articlesREQ()
+        .then(function (res){openArticles(res)})
+        .catch(function (er){er})
+}
+// OUVRE PAGE D'UN ARTICLE
+function loadArticle(id) {
+    articleREQ(id)
+        .then(function (res){openArticle(res)})
+        .catch(function (er){er})
+}
+
 // AFFICHAGE DES ARTICLES
-function createArticle(data) {
+function openArticles(articles) {
     newPage('Accueil')
-    titlePage = addNewElement(0, 'h1', mainDiv, '', "display-4 mt-5 mb-5 text-center", '', '', '', '', "Nos articles", '', 1)
-    articlesDiv = addNewElement(0, 'div', mainDiv, "articles", "row", '', '', '', '', '', '', 1)
+    addNewElement(0, 'h1', mainDiv, '', "display-4 mt-5 mb-5 text-center", '', '', '', '', "Nos articles", '', 1)
+    articlesDIV = addNewElement(0, 'div', mainDiv, "articles", "row", '', '', '', '', '', '', 1)
     // ARTICLE A L'UNITE
-    for (let i = 0; i < data.length; i++) {
-        price = data[i].price /100
-        firstDiv = addNewElement(0, 'div', articlesDiv, "", "col-lg-4 col-md-6", '', '','', '','', '', 1)
-        secondDiv = addNewElement(0, 'div', firstDiv, i, "card mt-1 mb-4 shadow-sm anim-zoom", '', '', '', '', '', '', 1)
-        secondDiv.addEventListener('click', function() {
-            oneArticleReq(data[i]._id, function (req){
-                openArticleRes(req)
-            }, function (error) { error })
-        }, false);
-        nameDiv = addNewElement(0, 'div', secondDiv, "", "card-header font-weight-bold", '', '', '', '', data[i].name, '', 1)
-        imgDiv = addNewElement(0, 'img', secondDiv, "", "card-img-top", '', '', data[i].imageUrl, data[i].description, data[i].name, '', 1)
-        cardBodyDiv = addNewElement(0, 'div', secondDiv, "", "card-body", '', '', '', '', '', '', 1)
-        priceDiv =  addNewElement(0, 'span', cardBodyDiv, "", "badge bg-secondary", '', '', '', '', price.toFixed(2).replace(".", ",") + "€", '', 1)
-        descDiv = addNewElement(0, 'p', cardBodyDiv, "", "card-text", '', '', '', '',data[i].description, '', 1)
+    for (let i = 0; i < articles.length; i++) {
+        price = articles[i].price /100
+        boxDIV = addNewElement(0, 'div', articlesDIV, "", "col-lg-4 col-md-6", '', '','', '','', '', 1)
+        articleDIV = addNewElement(0, 'div', boxDIV, articles[i]._id, "card mt-1 mb-4 shadow-sm anim-zoom", '', '', '', '', '', [['onclick','loadArticle(this.id)']], 1)
+        addNewElement(0, 'div', articleDIV, "", "card-header font-weight-bold", '', '', '', '', articles[i].name, '', 1)
+        addNewElement(0, 'img', articleDIV, "", "card-img-top", '', '', articles[i].imageUrl, articles[i].description, articles[i].name, '', 1)
+        articleBODY = addNewElement(0, 'div', articleDIV, "", "card-body", '', '', '', '', '', '', 1)
+        addNewElement(0, 'span', articleBODY, "", "badge bg-secondary", '', '', '', '', price.toFixed(2).replace(".", ",") + "€", '', 1)
+        addNewElement(0, 'p', articleBODY, "", "card-text", '', '', '', '',articles[i].description, '', 1)
     }
 }
-// PAGE ARTICLE
-function openArticleRes(data) {
-    newPage(data.name)
-    price = data.price /100
-    //BOUTON RETOUR
-    returnButton = addNewElement(0, 'button', mainDiv, '', 'btn btn-outline-secondary', '', 'button', '', '', 'Retour', '', 1)
-    returnButton.addEventListener('click', function() {
-        allArticlesReq(function (res){
-            createArticle(res)
-         }, function (error) { error});
-    }, false);
 
+// CHARGE LA PAGE D'UN ARTICLE
+function openArticle(article) {
+    newPage(article.name)
+    price = article.price /100
+    //BOUTON RETOUR
+    returnButton = addNewElement(0, 'button', mainDiv, '', 'btn btn-outline-secondary', '', 'button', '', '', 'Retour', [['onclick','loadArticles()']], 1)
     // DETAILS DU PRODUIT
     articleMainDiv = addNewElement(0, 'div', mainDiv, '', 'card mt-4 box-shadow anim-zoom-min shadow-sm', '', '', '', '', '', '', 1)
-    imgDiv = addNewElement(0, 'img', articleMainDiv, '', 'card-img-top', '', '', data.imageUrl, data.description, '', '', 1)
+    addNewElement(0, 'img', articleMainDiv, '', 'card-img-top', '', '', article.imageUrl, article.description, '', '', 1)
     articleMainDiv2 = addNewElement(0, 'div', mainDiv, '', 'card mt-4 box-shadow anim-zoom-min shadow-sm', '', '', '', '', '', '', 1)
     cardHeaderDiv = addNewElement(0, 'div', articleMainDiv2, '', 'card-header', '', '', '', '', '', '', 1)
-    titleDiv = addNewElement(0, 'h4', cardHeaderDiv, '', 'my-0 font-weight-normal text-center', '', '', '', '', data.name, '', 1)
+    addNewElement(0, 'h4', cardHeaderDiv, '', 'my-0 font-weight-normal text-center', '', '', '', '', article.name, '', 1)
     cardBodyDiv = addNewElement(0, 'div', articleMainDiv2, '', 'card-body', '', '', '', '', '', '', 1)
-    descDiv = addNewElement(0, 'p', cardBodyDiv, '', 'card-text', '', '', '', '', data.description, '', 1)
+    addNewElement(0, 'p', cardBodyDiv, '', 'card-text', '', '', '', '', article.description, '', 1)
     priceDiv = addNewElement(0, 'h5', cardBodyDiv, '', 'card-title', '', '', '', '', 'Prix: ', '', 1)
-    priceValue = addNewElement(0, 'span', priceDiv, '', 'badge bg-success', '', '', '', '', price.toFixed(2).replace( ".", "," ) + "€", '', 1)
-    couleurText = addNewElement(0, 'strong', cardBodyDiv, '', '', '', '', '', '', 'Couleur :', '', 1)
+    addNewElement(0, 'span', priceDiv, '', 'badge bg-success', '', '', '', '', price.toFixed(2).replace( ".", "," ) + "€", '', 1)
+    addNewElement(0, 'strong', cardBodyDiv, '', '', '', '', '', '', 'Couleur :', '', 1)
     dropDownDiv = addNewElement(0, 'div', cardBodyDiv, '', 'ml-2 mt-2 dropdown', '', '', '', '', '', '', 1)
     dropButton = addNewElement(0, 'button', dropDownDiv, 'dropdownMenuButton', 'btn btn-secondary dropdown-toggle', '', 'button', '', '', 'Couleur', [['data-toggle','dropdown'],['aria-haspopup', 'true'],['aria-expanded', 'false']], 1)
     downMenuDiv = addNewElement(0, 'div', dropDownDiv, '', 'dropdown-menu', '', '', '', '', '', [['aria-labelledby', 'dropdownMenuButton']], 1)
-
     // COULEUR DU PRODUIT
-    for (let i = 0; i < data.colors.length; i++) {
-        color = addNewElement(0, 'a', downMenuDiv, '', 'dropdown-item', '', '', '', '', data.colors[i], '', 1)
-        if (i === 0) dropButton.innerHTML = data.colors[i]
-        color.addEventListener('click', function() {
-            dropButton.innerHTML = data.colors[i]
-        }, false);
+    for (let i = 0; i < article.colors.length; i++) {
+        color = addNewElement(0, 'a', downMenuDiv, '', 'dropdown-item', '', '', '', '', article.colors[i], '', 1)
+        if (i === 0) dropButton.innerHTML = article.colors[i]
+        color.addEventListener('click', function() {dropButton.innerHTML = article.colors[i]}, false);
     }
-
     // AJOUTER AUX PANIER
     addPanierDiv = addNewElement(0, 'button', cardBodyDiv, '', 'btn btn-lg btn-block btn-primary mx-auto mt-2', 'max-width: 300px;', '', '', '', 'Ajouter au panier', '', 1)
-    addPanierDiv.addEventListener('click', function() {
-        panier = checkPanier(0, data._id, dropButton.innerHTML, panier, '')
-    }, false);
+    addPanierDiv.addEventListener('click', function() {panier = checkPanier(0, article._id, dropButton.innerHTML, panier, '')}, false);
 }
-// PAGE PANIER
+
+// CHARGER LA PAGE PANIER
 function openPanier(){
     newPage('Panier')
     var pricetot = 0
     var infosProduct = []
-        cardDiv = addNewElement(0, 'div', mainDiv, '', 'card shopping-cart mt-5', '', '', '', '', '', '', 1)
-        cardHeaderDiv = addNewElement(0, 'div', cardDiv, '', 'card-header bg-dark text-light align-middle', '', '', '', '', '', '', 1)
-            iconDiv = addNewElement(0, 'i', cardHeaderDiv, '', 'fa fa-shopping-cart', '', '', '', '', '', '', 1)
-            titreHeaderDiv = addNewElement(0, 'span', cardHeaderDiv, '', 'ml-2', '', '', '', '', 'Mon panier', '', 1)
-        cardBodyDiv = addNewElement(0, 'div', cardDiv, '', 'card-body', '', '', '', '', '', '', 1)
-        cardFooterDiv = addNewElement(0, 'div', cardDiv, '', 'card-footer px-5', '', '', '', '', '', '', 1)
-            priceTotDiv = addNewElement(0, 'div', cardFooterDiv, '', 'mt-3 text-right', '', '', '', '', 'Prix total: ', '', 1)
+    cardDIV = addNewElement(0, 'div', mainDiv, '', 'card mt-5', '', '', '', '', '', '', 1)
+    cardHeaderDIV = addNewElement(0, 'div', cardDIV, '', 'card-header bg-dark text-light align-middle', '', '', '', '', '', '', 1)
+    addNewElement(0, 'i', cardHeaderDIV, '', 'fa fa-shopping-cart', '', '', '', '', '', '', 1)
+    addNewElement(0, 'span', cardHeaderDIV, '', 'ml-2', '', '', '', '', 'Mon panier', '', 1)
+    cardBodyDIV = addNewElement(0, 'div', cardDIV, '', 'card-body', '', '', '', '', '', '', 1)
+    cardFooterDIV = addNewElement(0, 'div', cardDIV, '', 'card-footer px-5', '', '', '', '', '', '', 1)
+    pricesDIV = addNewElement(0, 'div', cardFooterDIV, '', 'mt-3 text-right', '', '', '', '', 'Prix total: ', '', 1)
 
-        // PRODUIT DANS LE PANIER
-        for (let i = 0; i < panier.length; i++) {
-            productDiv = addNewElement(0, 'div', cardBodyDiv, i, 'row', '', '', '', '', '', '', 1)
-                contentRowDiv = addNewElement(0, 'div', productDiv, '', 'col-4 col-sm-3 col-md-3 col-lg-2 text-center', '', '', '', '', '', '', 1)
-                    contentRowImg = addNewElement(0, 'img', contentRowDiv, '', 'img-responsive', 'max-height: 80px; max-width: 120px;', '', '', 'test', '', '', 1)
-                contentRow2Div = addNewElement(0, 'div', productDiv, '', 'col-8 col-sm-6 col-md-6 col-lg-8', '', '', '', '', '', '', 1)
-                    contentRow2Name = addNewElement(0, 'h4', contentRow2Div, '', 'product-name mb-0', '', '', '', '', '', '', 1)
-                        contentRow2NameStrong = addNewElement(0, 'strong', contentRow2Name, '', '', '', '', '', '', 'article.name', '', 1)
-                    contentRow2Color = addNewElement(0, 'h6', contentRow2Div, '', 'mt-0', '', '', '', '', '', '', 1)
-                        contentRow2ColorText = addNewElement(0, 'small', contentRow2Color, '', '', '', '', '', '', '', '', 1)
-                    contentRow2Desc = addNewElement(0, 'h5', contentRow2Div, '', '', '', '', '', '', '', '', 1)
-                        contentRow2DescStrong = addNewElement(0, 'small', contentRow2Desc, '', '', '', '', '', '', 'article.description', '', 1)
-                contentRow3Div = addNewElement(0, 'div', productDiv, '', 'row justify-content-end align-items-center mt-2 col-12 col-sm-3 col-md-3 col-lg-2', '', '', '', '', '', '', 1)
-                    contentRow3Price = addNewElement(0, 'div', contentRow3Div, '', 'col-6 col-sm-12 col-lg-10', '', '', '', '', '', '', 1)
-                        priceDiv = addNewElement(0, 'h6', contentRow3Price, '', '', '', '', '', '', '', '', 1)
-                            PriceName = addNewElement(0, 'strong', priceDiv, '', 'text-muted', '', '', '', '', 'Prix: ', '', 1)
-                                priceStrong = addNewElement(0, 'strong', priceDiv, '', '', '', '', '', '', '', '', 1)
-                        quantityDiv = addNewElement(0, 'h6', contentRow3Price, '', '', '', '', '', '', '', '', 1)
-                            quantityName = addNewElement(0, 'strong', quantityDiv, '', 'text-muted', '', '', '', '', 'Quantité: ', '', 1)
-                                quantityStrong = addNewElement(0, 'strong', quantityDiv, '', '', '', '', '', '', '', '', 1)
-                    contentRow3Delete = addNewElement(0, 'div', contentRow3Div, '', 'col-2 col-sm-6 text-right', '', '', '', '', '', '', 1)
-                        deleteDiv = addNewElement(0, 'button', contentRow3Delete, '', 'btn btn-outline-danger btn-xs', '', 'button', '', '', '', [['onclick','deleteFunction(this.parentNode.parentNode.parentNode.id)']], 1)
-                            deleteIconDiv = addNewElement(0, 'i', deleteDiv, '', 'fa fa-trash', '', '', '', '', '', '', 1)
-            if(i+1<panier.length) {hrDiv = addNewElement(0, 'hr', productDiv, '', 'my-3', '', '', '', '', '', '', 1)}else{hrDiv= ''}
+    // PRODUIT DANS LE PANIER
+    for (let i = 0; i < panier.length; i++) {
+        productDIV = addNewElement(0, 'div', cardBodyDIV, i, 'row', '', '', '', '', '', '', 1)
+        productPART1 = addNewElement(0, 'div', productDIV, '', 'col-4 col-sm-3 col-md-3 col-lg-2 text-center', '', '', '', '', '', '', 1)
+        productIMG = addNewElement(0, 'img', productPART1, '', 'img-responsive', 'max-height: 80px; max-width: 120px;', '', '', '', '', '', 1)
+        productPART2 = addNewElement(0, 'div', productDIV, '', 'col-8 col-sm-6 col-md-6 col-lg-8', '', '', '', '', '', '', 1)
+        productP2Name = addNewElement(0, 'h4', productPART2, '', 'product-name mb-0', '', '', '', '', '', '', 1)
+        productNAME = addNewElement(0, 'strong', productP2Name, '', '', '', '', '', '', '', '', 1)
+        productP2Color = addNewElement(0, 'h6', productPART2, '', 'mt-0', '', '', '', '', '', '', 1)
+        productCOLOR = addNewElement(0, 'small', productP2Color, '', '', '', '', '', '', '', '', 1)
+        productP2Desc = addNewElement(0, 'h5', productPART2, '', '', '', '', '', '', '', '', 1)
+        productDESC = addNewElement(0, 'small', productP2Desc, '', '', '', '', '', '', '', '', 1)
+        productP3 = addNewElement(0, 'div', productDIV, '', 'row justify-content-end align-items-center mt-2 col-12 col-sm-3 col-md-3 col-lg-2', '', '', '', '', '', '', 1)
+        productP3Price = addNewElement(0, 'div', productP3, '', 'col-6 col-sm-12 col-lg-10', '', '', '', '', '', '', 1)
+        productP3Pdiv = addNewElement(0, 'h6', productP3Price, '', '', '', '', '', '', '', '', 1)
+        addNewElement(0, 'strong', productP3Pdiv, '', 'text-muted', '', '', '', '', 'Prix: ', '', 1)
+        productPRICE = addNewElement(0, 'strong', productP3Pdiv, '', '', '', '', '', '', '', '', 1)
+        productP3Qt = addNewElement(0, 'h6', productP3Price, '', '', '', '', '', '', '', '', 1)
+        addNewElement(0, 'strong', productP3Qt, '', 'text-muted', '', '', '', '', 'Quantité: ', '', 1)
+        productQUANTITY = addNewElement(0, 'strong', productP3Qt, '', '', '', '', '', '', '', '', 1)
+        productP3Del = addNewElement(0, 'div', productP3, '', 'col-2 col-sm-6 text-right', '', '', '', '', '', '', 1)
+        productDEL = addNewElement(0, 'button', productP3Del, '', 'btn btn-outline-danger btn-xs', '', 'button', '', '', '', [['onclick','deleteFunction(this.parentNode.parentNode.parentNode.id)']], 1)
+        addNewElement(0, 'i', productDEL, '', 'fa fa-trash', '', '', '', '', '', '', 1)
+        if(i+1<panier.length) {hrDiv = addNewElement(0, 'hr', productDIV, '', 'my-3', '', '', '', '', '', '', 1)}else{hrDiv= ''}
 
-            infosProduct.push([productDiv, contentRowImg, contentRow2NameStrong, contentRow2DescStrong, contentRow2ColorText, 0, priceStrong, quantityStrong, hrDiv, deleteDiv])
-            panier[i][3] = infosProduct[i]
+        // CREATION DU TABLEAU D'ELEMENT DOM + INJECTION DANS LE TABLEAU PANIER
+        infosProduct.push([productDIV, productIMG, productNAME, productDESC, productCOLOR, 0, productPRICE, productQUANTITY, hrDiv, productDEL])
+        panier[i][3] = infosProduct[i]
 
-            oneArticleReq(panier[i][0], function (article) {
+        // METTRE LES INFOS RECUS DANS LES ELEMENTS DOM
+        articleREQ(panier[i][0])
+            .then(function (article) {
                 quantity = parseInt(panier[i][2], 10)
                 price = (article.price/100)*quantity
                 pricetot += price
                 panier[i][3][1].src = article.imageUrl
+                panier[i][3][1].alt = article.description
                 panier[i][3][2].innerHTML = article.name
                 panier[i][3][3].innerHTML = article.description
                 panier[i][3][4].innerHTML = panier[i][1]
@@ -136,57 +127,121 @@ function openPanier(){
                 panier[i][3][6].innerHTML = price.toFixed(2).replace( ".", "," ) + '€'
                 panier[i][3][7].innerHTML = 'x' + panier[i][2]
                 pricetotaldiv.innerHTML = pricetot.toFixed(2).replace( ".", "," ) + '€'
-            }, function (err) { error })
-        }
-
-        pricetotaldiv = addNewElement(0, 'strong', priceTotDiv, 'pricetotal', '', '', '', '', '', '0,00€', '', 1)
-        informationDiv = addNewElement(0, 'h4', cardFooterDiv, '', 'text-center my-4', '', '', '', '', 'Entrez vos informations', '', 1)
-
-        //FORMULAIRE
-        form = addNewElement(0, 'form', cardFooterDiv, '', 'row g-3 needs-validation mx-auto mb-3', 'max-width: 900px;', '', '', '', '', [['novalidate', '']], 1)
-            colNom = addNewElement(0, 'div', form, '', 'col-sm-6', '', '', '', '', '', '', 1)
-                nomLabel = addNewElement(0, 'label', colNom, '', 'form-label', '', '', '', '', 'Nom', [['for','nom']], 1)
-                nomInput = addNewElement(0, 'input', colNom, 'nom', 'form-control', '', 'text', '', '', '', '', 1)
-                nomInvalide = addNewElement(0, 'div', colNom, '', 'invalid-feedback', '', '', '', '', 'Un nom valide est requis', '', 1)
-            colPrenom = addNewElement(0, 'div', form, '', 'col-sm-6', '', '', '', '', '', '', 1)
-                prenomLabel = addNewElement(0, 'label', colPrenom, '', 'form-label', '', '', '', '', 'Prénom', [['for','prenom']], 1)
-                prenomInput = addNewElement(0, 'input', colPrenom, 'prenom', 'form-control', '', 'text', '', '', '', '', 1)
-                prenomInvalide = addNewElement(0, 'div', colPrenom, '', 'invalid-feedback', '', '', '', '', 'Un prenom valide est requis', '', 1)
-            colMail = addNewElement(0, 'div', form, '', 'col-sm-12', '', '', '', '', '', '', 1)
-                mailLabel = addNewElement(0, 'label', colMail, '', 'form-label', '', '', '', '', 'Email', [['for','email']], 1)
-                mailInput = addNewElement(0, 'input', colMail, 'email', 'form-control', '', '', '', '', '', [['placeholder','vous@exemple.fr'],['required', '']], 1)
-                mailInvalide = addNewElement(0, 'div', colMail, '', 'invalid-feedback', '', '', '', '', 'Une e-mail valide est requise', '', 1)
-            colAdress = addNewElement(0, 'div', form, '', 'col-sm-12', '', '', '', '', '', '', 1)
-                adressLabel = addNewElement(0, 'label', colAdress, '', 'form-label', '', '', '', '', 'Adresse', [['for','adress']], 1)
-                adressInput = addNewElement(0, 'input', colAdress, 'adress', 'form-control', '', '', '', '', '', [['placeholder','01 rue Saint Martin'],['required','']], 1)
-                adressInvalide = addNewElement(0, 'div', colAdress, '', 'invalid-feedback', '', '', '', '', 'Une adresse valide est requise', '', 1)
-            colPostal = addNewElement(0, 'div', form, '', 'col-sm-6', '', '', '', '', '', '', 1)
-                postalLabel = addNewElement(0, 'label', colPostal, '', 'form-label', '', '', '', '', 'Code postal', [['for','postal']], 1)
-                postalInput = addNewElement(0, 'input', colPostal, 'postal', 'form-control', '', 'text', '', '', '', [['placeholder','75000']], 1)
-                postalInvalide = addNewElement(0, 'div', colPostal, '', 'invalid-feedback', '', '', '', '', 'Un code postal valide est requis', '', 1)
-            colVille = addNewElement(0, 'div', form, '', 'col-sm-6', '', '', '', '', '', '', 1)
-                villeLabel = addNewElement(0, 'label', colVille, '', 'form-label', '', '', '', '', 'Ville', [['for', 'ville']], 1)
-                villeInput = addNewElement(0, 'input', colVille, 'ville', 'form-control', '', 'text', '', '', '', [['placeholder','Paris']], 1)
-                villeInvalide = addNewElement(0, 'div', colVille, '', 'invalid-feedback', '', '', '', '', 'Une ville valide est requise', '', 1)
-            hrDiv = addNewElement(0, 'hr', form, '', '', '', '', '', '', '', '', 1)
-            validButton = addNewElement(0, 'button', form, '', 'btn btn-primary btn-lg -btn-block', '', 'submit', '', '', 'Procéder au paiement', '', 1)
-
-            validButton.addEventListener('click', function() {
-                //ENVOYER LE FORMULAIRE
-            }, false);
-}
-function deleteFunction(id) {
-    id = parseInt(id, 10)
-    let priceTot = 0
-    if (panier[id][2] === 1) {
-        panier[id][3][0].remove()
-        console.log('je delete: ',panier[id][3][0])
-        if (id+1 === panier.length && id>0) panier[id-1][3][8].remove()
-    } 
-    panier = checkPanier(1, panier[id][0], panier[id][1], panier, id)
-    for (f=0;f<panier.length;f++){
-        priceTot += panier[f][3][5]*panier[f][2]
-        panier[f][3][0].id = f
+            })
+            .catch(function (er){er})
     }
-    pricetotaldiv.innerHTML = priceTot.toFixed(2).replace( ".", "," ) + '€' 
+    pricetotaldiv = addNewElement(0, 'strong', pricesDIV, 'pricetotal', '', '', '', '', '', '0,00€', '', 1)
+    informationDiv = addNewElement(0, 'h4', cardFooterDIV, '', 'text-center my-4', '', '', '', '', 'Entrez vos informations', '', 1)
+
+    //FORMULAIRE
+    form = addNewElement(0, 'form', cardFooterDIV, '', 'row g-3 needs-validation mx-auto mb-3', 'max-width: 900px;', '', '', '', '', [['novalidate', '']], 1)
+        colNom = addNewElement(0, 'div', form, '', 'col-sm-6', '', '', '', '', '', '', 1)
+            nomLabel = addNewElement(0, 'label', colNom, '', 'form-label', '', '', '', '', 'Nom', [['for','nom']], 1)
+            nomInput = addNewElement(0, 'input', colNom, 'nom', 'form-control', '', 'text', '', '', '', [['required','']], 1)
+            nomInvalide = addNewElement(0, 'div', colNom, '', 'invalid-feedback', '', '', '', '', 'Un nom valide est requis', '', 1)
+        colPrenom = addNewElement(0, 'div', form, '', 'col-sm-6', '', '', '', '', '', '', 1)
+            prenomLabel = addNewElement(0, 'label', colPrenom, '', 'form-label', '', '', '', '', 'Prénom', [['for','prenom']], 1)
+            prenomInput = addNewElement(0, 'input', colPrenom, 'prenom', 'form-control', '', 'text', '', '', '', [['min','5'],['max','30'],['required','']], 1)
+            prenomInvalide = addNewElement(0, 'div', colPrenom, '', 'invalid-feedback', '', '', '', '', 'Un prenom valide est requis', '', 1)
+        colMail = addNewElement(0, 'div', form, '', 'col-sm-12', '', '', '', '', '', '', 1)
+            mailLabel = addNewElement(0, 'label', colMail, '', 'form-label', '', '', '', '', 'Email', [['for','email']], 1)
+            mailInput = addNewElement(0, 'input', colMail, 'email', 'form-control', '', 'email', '', '', '', [['placeholder','vous@exemple.fr'],['required', '']], 1)
+            mailInvalide = addNewElement(0, 'div', colMail, '', 'invalid-feedback', '', '', '', '', 'Une e-mail valide est requise', '', 1)
+        colAdress = addNewElement(0, 'div', form, '', 'col-sm-12', '', '', '', '', '', '', 1)
+            adressLabel = addNewElement(0, 'label', colAdress, '', 'form-label', '', '', '', '', 'Adresse', [['for','adress']], 1)
+            adressInput = addNewElement(0, 'input', colAdress, 'adress', 'form-control', '', '', '', '', '', [['placeholder','01 rue Saint Martin'],['required','']], 1)
+            adressInvalide = addNewElement(0, 'div', colAdress, '', 'invalid-feedback', '', '', '', '', 'Une adresse valide est requise', '', 1)
+        colPostal = addNewElement(0, 'div', form, '', 'col-sm-6', '', '', '', '', '', '', 1)
+            postalLabel = addNewElement(0, 'label', colPostal, '', 'form-label', '', '', '', '', 'Code postal', [['for','postal']], 1)
+            postalInput = addNewElement(0, 'input', colPostal, 'postal', 'form-control', '', 'text', '', '', '', [['placeholder','75000'],['required','']], 1)
+            postalInvalide = addNewElement(0, 'div', colPostal, '', 'invalid-feedback', '', '', '', '', 'Un code postal valide est requis', '', 1)
+        colVille = addNewElement(0, 'div', form, '', 'col-sm-6', '', '', '', '', '', '', 1)
+            villeLabel = addNewElement(0, 'label', colVille, '', 'form-label', '', '', '', '', 'Ville', [['for', 'ville']], 1)
+            villeInput = addNewElement(0, 'input', colVille, 'ville', 'form-control', '', 'text', '', '', '', [['placeholder','Paris'],['required','']], 1)
+            villeInvalide = addNewElement(0, 'div', colVille, '', 'invalid-feedback', '', '', '', '', 'Une ville valide est requise', '', 1)
+        hrDiv = addNewElement(0, 'hr', form, '', '', '', '', '', '', '', '', 1)
+        validButton = addNewElement(0, 'button', form, '', 'btn btn-primary btn-lg -btn-block', '', 'submit', '', '', 'Procéder au paiement', '', 1)
+
+        checkSubmit()
+}
+
+function checkSubmit() {
+    var forms = document.querySelectorAll('.needs-validation')
+    form = Array.prototype.slice.call(forms)
+
+    function checkInput() {
+        for (let i=0; i < form[0].length-1; i++) {
+            // Check chaque input du formulaire
+            form[0][i].addEventListener('input', function () {
+                // Controle la longueur
+                if (invalid[i].length === 4 && (this.value.length < invalid[i][0] || this.value.length > invalid[i][1])) {
+                    if (this.className.includes('is-valid')) this.classList.remove('is-valid')
+                    if (!this.className.includes('is-invalid')) this.classList.add('is-invalid')
+                    return invalid[i].innerHTML = invalid[i][3]
+                } else if (invalid[i].length === 3 && this.value.length !== invalid[i][0]) {
+                    if (this.className.includes('is-valid')) this.classList.remove('is-valid')
+                    if (!this.className.includes('is-invalid')) this.classList.add('is-invalid')
+                    return invalid[i].innerHTML = invalid[i][3]
+                }
+                // Controle les caractères spéciaux
+                if (!this.value.match(regex[i])) {
+                    if (this.className.includes('is-valid')) this.classList.remove('is-valid')
+                    if (!this.className.includes('is-invalid')) this.classList.add('is-invalid')
+                    return invalid[i].innerHTML = 'Il ne doit pas contenir de caractères spéciaux.'
+                }
+                // Valide
+                if (this.className.includes('is-invalid')) this.classList.remove('is-invalid')
+                if (!this.className.includes('is-valid')) this.classList.add('is-valid')
+                }, false)}
+    }
+
+    // Text invalide -> Nom | Prénom | Email | Adresse | Code Postal | Ville
+    invalid = []
+    invalid.push([3, 20, nomInvalide, 'Votre nom doit composer entre 3 et 20 caractères.'])
+    invalid.push([3, 20, prenomInvalide, 'Votre prénom doit composer entre 3 et 20 caractères.'])
+    invalid.push([6, 45, mailInvalide, 'Votre email doit composer entre 6 et 45 caractères.'])
+    invalid.push([8, 45, adressInvalide, 'Votre adresse doit composer entre 8 et 45 caractères.'])
+    invalid.push([5, postalInvalide, 'Votre code postal doit composer 5 caractères.'])
+    invalid.push([3, 35, villeInvalide, 'Votre ville doit composer entre 3 et 35 caractères.'])
+
+    // Regex -> Nom | Prénom | Email | Adresse | Code Postal | Ville
+    regex = []
+    regex.push(/^\b([a-zA-Z-ÀÉÈàïîéè]{3,20}|([a-zA-Z-ÀÉÈàïîéè]+[\s][a-zA-Z-ÀÉÈàïîéè]+|[a-zA-Z-ÀÉÈàïîéè]+[\s][a-zA-Z-ÀÉÈàïîéè]+[\s][a-zA-Z-ÀÉÈàïîéè]+))\b$/gm)
+    regex.push(/^\b([a-zA-Z-ÀÉÈàïîéè]{3,20}|[a-zA-Z-ÀÉÈàïîéè]+[\s][a-zA-Z-ÀÉÈàïîéè]+)\b$/gm)
+    regex.push(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/gm)
+    regex.push(/^[\d]{1,4}\s[A-z]+\s[A-z]+(\s[A-z]+|\s[A-z]+\s[A-z]+)?$/gm)
+    regex.push(/^[0-9]{5}$/gm)
+    regex.push(/^\b([a-zA-Z-ÀÉÈàïîéè]{3,35}|([a-zA-Z-ÀÉÈàïîéè]+[\s][a-zA-Z-ÀÉÈàïîéè]+|[a-zA-Z-ÀÉÈàïîéè]+[\s][a-zA-Z-ÀÉÈàïîéè]+[\s][a-zA-Z-ÀÉÈàïîéè]+))\b$/gm)
+
+    checkInput()
+
+    form[0].addEventListener('submit', function (event) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
+        var checkvalid = 0
+        for (let f=0; f < form[0].length-1; f++) {if (form[0][f].className.includes('is-valid')) { checkvalid += 1}}
+
+        if (checkvalid === 6) {
+            if (panier.length === 0) return alertSpoil('Erreur:', 'Votre panier est vide !', 'alert-danger')
+            // Creation du JSON et du tableau produits
+            data = [form[0][0].value, form[0][1].value, form[0][2].value, form[0][3].value, form[0][4].value, form[0][5].value]
+            products = []
+            for (let it=0;it < panier.length; it++) {products.push(panier[it][0])}
+
+            // Envoie req POST avec les infos
+            postREQ(data, products)
+                .then(function (res){confirm(res)})
+                .catch(function (er){er})
+        } else {
+            alertSpoil('Erreur:', 'Les champs ne sont pas rempli correctement.', 'alert-danger')
+        }
+    }, false)
+}
+// Page confirmation
+function confirm(data) {
+    newPage('Confirmation')
+    console.log(data.orderId)
+    addNewElement(0, 'h1', mainDiv, '', "display-4 mt-5 mb-5 text-center", '', '', '', '', "Votre commande a bien été validée", '', 1)
+
 }

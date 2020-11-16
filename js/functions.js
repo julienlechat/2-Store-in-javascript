@@ -15,7 +15,7 @@ function alertSpoil(title, desc, color) {
     divTitle = addNewElement(0, 'strong', divAlert, '', '', '', '', '', '', title + '', '', 2)
     buttonAlert = addNewElement(0, 'button', divAlert, '', 'btn-close', '', 'button', '', '', '', [['data-dismiss','alert'],['aria-dismiss','Close']], 1)
 }
-// AJOUTER UN ELEMENT
+// AJOUTER UN ELEMENT DOM
 function addNewElement(val, elementName, to, id, className, style, type, src, alt, content, attribut, append) {
     if (val === 0){newElement = document.createElement(elementName)}else if(val === 1){newElement = document.getElementById(elementName)}else{newElement = document.getElementsByClassName(elementName)}
     if (id !== "") newElement.id = id
@@ -30,7 +30,7 @@ function addNewElement(val, elementName, to, id, className, style, type, src, al
     if (append === 2) to.prepend(newElement);
     return newElement
 }
-// PANIER
+// CHARGEMENT DU PANIER
 function loadPanier() {
     if (localStorage.getItem("panier") !== null) {
         panier = JSON.parse(localStorage.getItem("panier"))
@@ -38,12 +38,9 @@ function loadPanier() {
     } else {panier = []}
     return panier
 }
-function addDelPanier(panier) {
-    localStorage.setItem("panier", JSON.stringify(panier));
-    showPanierValue(panier)
-    return panier
-}
+// AJOUTE/RETIRE UN PRODUIT & GROUPE LES PRODUITS EXISTANT
 function checkPanier(action, id, color, panier, idPanier) {
+    // RECHERCHE DANS LE TABLEAU PANIER
     function check() {
         for (let i = 0; i < panier.length; i++) {
             if (panier[i][0] === id && panier[i][1] === color) {
@@ -66,20 +63,23 @@ function checkPanier(action, id, color, panier, idPanier) {
         if (action === 0) panier.push([id, color, 1])
         if (action === 1) panier.splice(panier.indexOf(panier[idPanier]), 1)
     }
-    changeStatus = addDelPanier(panier)
-    console.log('panier: ' + changeStatus)
-    return changeStatus
+    localStorage.setItem("panier", JSON.stringify(panier));
+    showPanierValue(panier)
+    return panier
 }
+// CHANGE L'ELEMENT PANIER DANS LE DOM
 function showPanierValue(panier) {
-    panier.length > 0 ? panierDiv = addNewElement(1, 'panier', '', 'panier', 'nav-link', '', '', '', '', '<strong>Panier <span class="badge bg-secondary">' + panier.length +'</span></strong>', '', 0) : panierDiv = addNewElement(1, 'panier', '', 'panier', 'nav-link', '', '', '', '', 'Panier', '', 0)
+    if (panier.length > 0){
+        panierDiv = addNewElement(1, 'panier', '', 'panier', 'nav-link', '', '', '', '', '<strong>Panier <span class="badge bg-secondary">' + panier.length +'</span></strong>', '', 0)
+    }else{
+        panierDiv = addNewElement(1, 'panier', '', 'panier', 'nav-link', '', '', '', '', 'Panier', '', 0)}
 }
-// BOUTON DELETE - PANIER
+// BOUTON DELETE ELEMENT DU PANIER
 function deleteFunction(id) {
     id = parseInt(id, 10)
     let priceTot = 0
     if (panier[id][2] === 1) {
         panier[id][3][0].remove()
-        console.log('je delete: ',panier[id][3][0])
         if (id+1 === panier.length && id>0) panier[id-1][3][8].remove()
     } 
     panier = checkPanier(1, panier[id][0], panier[id][1], panier, id)
