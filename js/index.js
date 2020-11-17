@@ -241,7 +241,14 @@ function checkSubmit() {
 // Page confirmation
 function confirm(data) {
     newPage('Confirmation')
-    addNewElement(0, 'div', mainDiv, '', "alert alert-success mt-5", '', '', '', '', "Votre commande n° " + data.orderId + " a bien été validée", [['role','alert']], 1)
+    pricetot = 0
+
+    // Delete panier
+    panier = []
+    localStorage.clear
+    showPanierValue(panier)
+
+    addNewElement(0, 'div', mainDiv, '', "alert alert-success mt-3", '', '', '', '', "Votre commande n° " + data.orderId + " a bien été validée", [['role','alert']], 1)
     card = addNewElement(0, 'div', mainDiv, '', "card mt-5", '', '', '', '', '', '', 1)
     cardBody = addNewElement(0, 'div', card, '', "card-body mx-4 mt-4", '', '', '', '', '', '', 1)
     addNewElement(0, 'h5', cardBody, '', "card-title", '', '', '', '', 'Félicitation ' + data.contact.firstName + ' ' + data.contact.lastName + ' !', '', 1)
@@ -250,6 +257,7 @@ function confirm(data) {
 
     for (i=0; i < data.products.length; i++) {
         price = data.products[i].price/100
+        pricetot += price
         articleData = addNewElement(0, 'div', cardBody, '', "card mb-3", "max-width: 800px", '', '', '', '', '', 1)
         articleRow = addNewElement(0, 'div', articleData, '', "row g-0", '', '', '', '', '', '', 1)
         articleRowCol = addNewElement(0, 'div', articleRow, '', "col-lg-4", '', '', '', '', '', '', 1)
@@ -261,7 +269,7 @@ function confirm(data) {
         priceP = addNewElement(0, 'p', articleBody, '', "card-text", '', '', '', '', '', '', 1)
         addNewElement(0, 'small', priceP, '', "card-muted", '', '', '', '', price.toFixed(2).replace( ".", "," ) + '€', '', 1)
     }
-
+    addNewElement(0, 'p', cardBody, '', "card-text mt-1", '', '', '', '', 'Montant total de votre commande: <b>' + pricetot.toFixed(2).replace( ".", "," ) + '€</b>', '', 1)
     addNewElement(0, 'p', cardBody, '', "card-text mt-4", '', '', '', '', "Vos/votre article(s) seront envoyé(s) à l'adresse:", '', 1)
     addNewElement(0, 'p', cardBody, '', "card-text", '', '', '', '', '<b>' + data.contact.lastName + ' ' + data.contact.firstName + '</br>' + data.contact.address + '<br>' + data.contact.city + '</b>', '', 1)
 }
