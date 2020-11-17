@@ -89,3 +89,77 @@ function deleteFunction(id) {
     }
     pricetotaldiv.innerHTML = priceTot.toFixed(2).replace( ".", "," ) + '€' 
 }
+// COMMANDE DU PRODUIT
+function checkSubmit() {
+    var forms = document.querySelectorAll('.needs-validation')
+    form = Array.prototype.slice.call(forms)
+
+    function checkInput() {
+        for (let i=0; i < form[0].length-1; i++) {
+            // Check chaque input du formulaire
+            form[0][i].addEventListener('input', function () {
+                // Controle la longueur
+                if (invalid[i].length === 4 && (this.value.length < invalid[i][0] || this.value.length > invalid[i][1])) {
+                    if (this.className.includes('is-valid')) this.classList.remove('is-valid')
+                    if (!this.className.includes('is-invalid')) this.classList.add('is-invalid')
+                    return invalid[i].innerHTML = invalid[i][3]
+                } else if (invalid[i].length === 3 && this.value.length !== invalid[i][0]) {
+                    if (this.className.includes('is-valid')) this.classList.remove('is-valid')
+                    if (!this.className.includes('is-invalid')) this.classList.add('is-invalid')
+                    return invalid[i].innerHTML = invalid[i][3]
+                }
+                // Controle les caractères spéciaux
+                if (!this.value.match(regex[i])) {
+                    if (this.className.includes('is-valid')) this.classList.remove('is-valid')
+                    if (!this.className.includes('is-invalid')) this.classList.add('is-invalid')
+                    return invalid[i].innerHTML = 'Il ne doit pas contenir de caractères spéciaux.'
+                }
+                // Valide
+                if (this.className.includes('is-invalid')) this.classList.remove('is-invalid')
+                if (!this.className.includes('is-valid')) this.classList.add('is-valid')
+                }, false)}
+    }
+
+    // Text invalide -> Nom | Prénom | Email | Adresse | Code Postal | Ville
+    invalid = []
+    invalid.push([3, 20, nomInvalide, 'Votre nom doit composer entre 3 et 20 caractères.'])
+    invalid.push([3, 20, prenomInvalide, 'Votre prénom doit composer entre 3 et 20 caractères.'])
+    invalid.push([6, 45, mailInvalide, 'Votre email doit composer entre 6 et 45 caractères.'])
+    invalid.push([8, 45, adressInvalide, 'Votre adresse doit composer entre 8 et 45 caractères.'])
+    invalid.push([5, postalInvalide, 'Votre code postal doit composer 5 caractères.'])
+    invalid.push([3, 35, villeInvalide, 'Votre ville doit composer entre 3 et 35 caractères.'])
+
+    // Regex -> Nom | Prénom | Email | Adresse | Code Postal | Ville
+    regex = []
+    regex.push(/^\b([a-zA-Z-ÀÉÈàïîéè]{3,20}|([a-zA-Z-ÀÉÈàïîéè]+[\s][a-zA-Z-ÀÉÈàïîéè]+|[a-zA-Z-ÀÉÈàïîéè]+[\s][a-zA-Z-ÀÉÈàïîéè]+[\s][a-zA-Z-ÀÉÈàïîéè]+))\b$/gm)
+    regex.push(/^\b([a-zA-Z-ÀÉÈàïîéè]{3,20}|[a-zA-Z-ÀÉÈàïîéè]+[\s][a-zA-Z-ÀÉÈàïîéè]+)\b$/gm)
+    regex.push(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/gm)
+    regex.push(/^[\d]{1,4}\s[A-z]+\s[A-z]+(\s[A-z]+|\s[A-z]+\s[A-z]+)?$/gm)
+    regex.push(/^[0-9]{5}$/gm)
+    regex.push(/^\b([a-zA-Z-ÀÉÈàïîéè]{3,35}|([a-zA-Z-ÀÉÈàïîéè]+[\s][a-zA-Z-ÀÉÈàïîéè]+|[a-zA-Z-ÀÉÈàïîéè]+[\s][a-zA-Z-ÀÉÈàïîéè]+[\s][a-zA-Z-ÀÉÈàïîéè]+))\b$/gm)
+
+    checkInput()
+
+    form[0].addEventListener('submit', function (event) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
+        var checkvalid = 0
+        for (let f=0; f < form[0].length-1; f++) {if (form[0][f].className.includes('is-valid')) { checkvalid += 1}}
+
+        if (checkvalid === 6) {
+            if (panier.length === 0) return alertSpoil('Erreur:', 'Votre panier est vide !', 'alert-danger')
+            // Creation du JSON et du tableau produits
+            data = [form[0][0].value, form[0][1].value, form[0][2].value, form[0][3].value, form[0][4].value, form[0][5].value]
+            products = []
+            for (let it=0;it < panier.length; it++) {products.push(panier[it][0])}
+
+            // Envoie req POST avec les infos
+            postREQ(data, products)
+                .then(function (res){confirm(res)})
+                .catch(function (er){er})
+        } else {
+            alertSpoil('Erreur:', 'Les champs ne sont pas rempli correctement.', 'alert-danger')
+        }
+    }, false)
+}
