@@ -7,7 +7,7 @@
   cursor: pointer;
 }
 .anim-zoom-min:hover {
-  transform: scale(1.02);
+  transform: scale(1.015);
 }
 #index,
 #panier {

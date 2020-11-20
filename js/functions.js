@@ -133,7 +133,7 @@ function checkSubmit() {
     regex = []
     regex.push(/^\b([a-zA-Z-ÀÉÈàïîéè]{3,20}|([a-zA-Z-ÀÉÈàïîéè]+[\s][a-zA-Z-ÀÉÈàïîéè]+|[a-zA-Z-ÀÉÈàïîéè]+[\s][a-zA-Z-ÀÉÈàïîéè]+[\s][a-zA-Z-ÀÉÈàïîéè]+))\b$/gm)
     regex.push(/^\b([a-zA-Z-ÀÉÈàïîéè]{3,20}|[a-zA-Z-ÀÉÈàïîéè]+[\s][a-zA-Z-ÀÉÈàïîéè]+)\b$/gm)
-    regex.push(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/gm)
+    regex.push(/^[\w-\.]+@([\w-]+\.)+[\w-]+$/gm)
     regex.push(/^[\d]{1,4}\s[A-z]+\s[A-z]+(\s[A-z]+|\s[A-z]+\s[A-z]+)?$/gm)
     regex.push(/^[0-9]{5}$/gm)
     regex.push(/^\b([a-zA-Z-ÀÉÈàïîéè]{3,35}|([a-zA-Z-ÀÉÈàïîéè]+[\s][a-zA-Z-ÀÉÈàïîéè]+|[a-zA-Z-ÀÉÈàïîéè]+[\s][a-zA-Z-ÀÉÈàïîéè]+[\s][a-zA-Z-ÀÉÈàïîéè]+))\b$/gm)
@@ -162,4 +162,8 @@ function checkSubmit() {
             alertSpoil('Erreur:', 'Les champs ne sont pas rempli correctement.', 'alert-danger')
         }
     }, false)
+}
+function confirm(res) {
+    localStorage.setItem("confirmation", JSON.stringify(res));
+    window.location.href = "confirmation.html";
 }
